@@ -8,17 +8,15 @@ if [ "$#" -ne 2 ]; then
 	exit 1 
 fi
 
-find "$1" -type f -print0 | while IFS= read -r -d '' file; do
+for file in $(find "$1" -type f); do
     filename=$(basename "$file")
     dest_file="$2/$filename"
-    counter=1
-    while [ -f "$dest_file" ]; do
-        base="${filename%.*}"
-        ext="${filename##*.}"
-        dest_file="$2/${base}_${counter}.${ext}"
-        ((counter++))
-    done
+    if [ -f "$dest_file" ]; then
+        i=1
+        while [ -f "$dest_file" ]; do
+            dest_file="$2/${filename%.*}_$i.${filename##*.}"
+            ((i++))
+        done
+    fi
     cp "$file" "$dest_file"
 done
-
-
